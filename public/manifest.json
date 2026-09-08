@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "description": "A powerful collection of useful browser tools.",
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "scripting"
   ],
   "action": {
     "default_popup": "index.html"
