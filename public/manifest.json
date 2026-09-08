@@ -1,0 +1,9 @@
+{
+  "manifest_version": 3,
+  "name": "WebToolKit",
+  "version": "1.0.0",
+  "description": "A powerful collection of useful browser tools.",
+  "action": {
+    "default_popup": "index.html"
+  }
+}
