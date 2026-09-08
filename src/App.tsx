@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import PasswordGenerator from './tools/PasswordGenerator'
-import ImageExtractor from './tools/ImageExtractor'
+import PasswordGenerator from './tools/password-generator/PasswordGenerator'
+import ImageExtractor from './tools/image-extractor/ImageExtractor'
 
 type Tool = 'dashboard' | 'password' | 'images'
 
