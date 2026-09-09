@@ -1,10 +1,10 @@
 import { useState } from 'react'
 
-import PasswordDisplay from './PasswordDisplay'
-import PasswordLength from './PasswordLength'
-import PasswordOptions from './PasswordOptions'
-import StrengthIndicator from './StrengthIndicator'
-import { generatePassword } from './passwordUtils'
+import PasswordDisplay from './components/PasswordDisplay'
+import PasswordLength from './components/PasswordLength'
+import PasswordOptions from './components/PasswordOptions'
+import StrengthIndicator from './components/StrengthIndicator'
+import { generatePassword } from '../../content/passwordUtils'
 
 type Strength = 'Weak' | 'Medium' | 'Strong' | 'Unbreakable'
 

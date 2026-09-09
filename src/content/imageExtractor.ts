@@ -7,7 +7,10 @@ type ExtractedImage = {
 
 function normalizeImageUrl(url: string): string {
   try {
-    const absoluteUrl = new URL(url, window.location.href)
+    const absoluteUrl = new URL(
+      url,
+      window.location.href,
+    )
 
     if (
       absoluteUrl.protocol !== 'http:' &&
@@ -22,7 +25,9 @@ function normalizeImageUrl(url: string): string {
   }
 }
 
-function getImageUrl(img: HTMLImageElement): string {
+function getImageUrl(
+  img: HTMLImageElement,
+): string {
   const candidates = [
     img.currentSrc,
     img.src,
@@ -44,15 +49,18 @@ function getImageUrl(img: HTMLImageElement): string {
 
   return ''
 }
+
 function extractImages(): ExtractedImage[] {
   const results: ExtractedImage[] = []
   const seen = new Set<string>()
 
-  // 1. Normal <img> elements
+  // <img>
   document.querySelectorAll('img').forEach((img) => {
     const src = getImageUrl(img)
 
-    if (!src || seen.has(src)) return
+    if (!src || seen.has(src)) {
+      return
+    }
 
     seen.add(src)
 
@@ -64,89 +72,198 @@ function extractImages(): ExtractedImage[] {
     })
   })
 
-  // 2. <picture><source> images
-document.querySelectorAll('picture source').forEach((source) => {
-  const srcset = source.getAttribute('srcset')
+  // <picture><source>
+  document
+    .querySelectorAll('picture source')
+    .forEach((source) => {
+      const srcset =
+        source.getAttribute('srcset')
 
-  if (!srcset) return
+      if (!srcset) return
 
-  const urls = srcset
-    .split(',')
-    .map((item) => item.trim().split(/\s+/)[0])
-    .filter(Boolean)
+      const urls = srcset
+        .split(',')
+        .map(
+          (item) =>
+            item.trim().split(/\s+/)[0],
+        )
+        .filter(Boolean)
 
-  urls.forEach((url) => {
-    const absoluteUrl = normalizeImageUrl(url)
+      urls.forEach((url) => {
+        const absoluteUrl =
+          normalizeImageUrl(url)
 
-    if (!absoluteUrl || seen.has(absoluteUrl)) {
-      return
-    }
-
-    seen.add(absoluteUrl)
-
-    results.push({
-      src: absoluteUrl,
-      alt: '',
-      width: 0,
-      height: 0,
-    })
-  })
-})
-
-  // 3. CSS background images
-  document.querySelectorAll<HTMLElement>('*').forEach((element) => {
-    const backgroundImage = getComputedStyle(element).backgroundImage
-
-    if (!backgroundImage || backgroundImage === 'none') {
-      return
-    }
-
-    const matches = backgroundImage.matchAll(
-      /url\(["']?(.*?)["']?\)/g,
-    )
-
-    for (const match of matches) {
-      const url = normalizeImageUrl(match[1])
-
-    if (!url || seen.has(url)) {
-      continue
-    }
-
-      try {
-        const absoluteUrl = new URL(
-          url,
-          window.location.href,
-        ).href
-
-        if (seen.has(absoluteUrl)) return
+        if (
+          !absoluteUrl ||
+          seen.has(absoluteUrl)
+        ) {
+          return
+        }
 
         seen.add(absoluteUrl)
 
         results.push({
           src: absoluteUrl,
           alt: '',
+          width: 0,
+          height: 0,
+        })
+      })
+    })
+
+  // CSS background images
+  document
+    .querySelectorAll<HTMLElement>('*')
+    .forEach((element) => {
+      const backgroundImage =
+        getComputedStyle(element)
+          .backgroundImage
+
+      if (
+        !backgroundImage ||
+        backgroundImage === 'none'
+      ) {
+        return
+      }
+
+      const matches =
+        backgroundImage.matchAll(
+          /url\(["']?(.*?)["']?\)/g,
+        )
+
+      for (const match of matches) {
+        const url = normalizeImageUrl(
+          match[1],
+        )
+
+        if (!url || seen.has(url)) {
+          continue
+        }
+
+        seen.add(url)
+
+        results.push({
+          src: url,
+          alt: '',
           width: element.offsetWidth,
           height: element.offsetHeight,
         })
-      } catch {
-        // Ignore invalid URLs
       }
-    }
-  })
+    })
 
   return results
 }
 
-chrome.runtime.onMessage.addListener(
-  (message, _sender, sendResponse) => {
-    if (message.type !== 'GET_IMAGES') {
-      return
-    }
+function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
+}
 
-    const images = extractImages()
+async function scanFullPage(): Promise<ExtractedImage[]> {
+  const scrollElement =
+    document.scrollingElement
 
-    sendResponse({
-      images,
+  if (!scrollElement) {
+    return extractImages()
+  }
+
+  const originalPosition = window.scrollY
+
+  const pageHeight =
+    scrollElement.scrollHeight
+
+  const viewportHeight =
+    window.innerHeight
+
+  const step = Math.max(
+    viewportHeight * 0.8,
+    300,
+  )
+
+  const positions: number[] = []
+
+  for (
+    let position = 0;
+    position < pageHeight;
+    position += step
+  ) {
+    positions.push(position)
+  }
+
+  // Always scan the very bottom
+  positions.push(
+    Math.max(
+      0,
+      pageHeight - viewportHeight,
+    ),
+  )
+
+  const seen = new Set<string>()
+  let allImages: ExtractedImage[] = []
+
+  for (const position of positions) {
+    window.scrollTo({
+      top: position,
+      behavior: 'instant',
     })
-  },
-)
+
+    // Give lazy-loaded images time to load
+    await wait(350)
+
+    const currentImages =
+      extractImages()
+
+    for (const image of currentImages) {
+      if (seen.has(image.src)) {
+        continue
+      }
+
+      seen.add(image.src)
+      allImages.push(image)
+    }
+  }
+
+  // Return to original position
+  window.scrollTo({
+    top: originalPosition,
+    behavior: 'instant',
+  })
+
+  return allImages
+}
+
+// Prevent duplicate listeners if content.js
+// gets injected more than once.
+const globalWindow =
+  window as typeof window & {
+    __webtoolkitLoaded?: boolean
+  }
+
+if (!globalWindow.__webtoolkitLoaded) {
+  globalWindow.__webtoolkitLoaded = true
+
+  chrome.runtime.onMessage.addListener(
+    (message, _sender, sendResponse) => {
+      if (message.type === 'GET_IMAGES') {
+        const images = extractImages()
+
+        sendResponse({
+          images,
+        })
+
+        return
+      }
+
+      if (message.type === 'SCAN_FULL_PAGE') {
+        scanFullPage().then((images) => {
+          sendResponse({
+            images,
+          })
+        })
+
+        return true
+      }
+    },
+  )
+}
