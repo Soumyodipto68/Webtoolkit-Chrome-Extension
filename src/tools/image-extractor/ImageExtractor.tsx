@@ -86,6 +86,25 @@ function ImageExtractor() {
     }
   }
 
+  const downloadImage = async (url: string, index: number) => {
+    try {
+      const urlObject = new URL(url)
+
+      const pathname = urlObject.pathname
+      const extension =
+        pathname.match(/\.(jpg|jpeg|png|gif|webp|svg|avif)$/i)?.[1] ||
+        'jpg'
+
+      await chrome.downloads.download({
+        url,
+        filename: `image-${index + 1}.${extension}`,
+        saveAs: false,
+      })
+    } catch (error) {
+      console.error('Failed to download image:', error)
+    }
+  }
+
   return (
     <main className="min-h-[500px] w-[380px] bg-zinc-950 p-5 text-white">
       {/* Header */}
@@ -202,6 +221,15 @@ function ImageExtractor() {
                       className="flex-1 rounded-lg bg-zinc-800 px-3 py-2 text-xs text-zinc-300 transition hover:bg-zinc-700 hover:text-white"
                     >
                       ↗ Open
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        downloadImage(image.src, index)
+                      }
+                      className="flex-1 rounded-lg bg-zinc-800 px-3 py-2 text-xs text-zinc-300 transition hover:bg-zinc-700 hover:text-white"
+                    >
+                      ⬇️ Download
                     </button>
                   </div>
                 </div>

@@ -5,7 +5,8 @@
   "description": "A powerful collection of useful browser tools.",
   "permissions": [
     "activeTab",
-    "scripting"
+    "scripting",
+    "downloads"
   ],
   "action": {
     "default_popup": "index.html"
