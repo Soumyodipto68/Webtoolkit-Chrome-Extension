@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import PasswordGenerator from './tools/password-generator/PasswordGenerator'
 import ImageExtractor from './tools/image-extractor/ImageExtractor'
+import ColorTools from './tools/color-tools/ColorTools'
 
-type Tool = 'dashboard' | 'password' | 'images'
+type Tool = 'dashboard' | 'password' | 'images' | 'colors'
 
 function App() {
   const [activeTool, setActiveTool] = useState<Tool>('dashboard')
@@ -16,6 +17,15 @@ function App() {
   if (activeTool === 'images') {
     return (
       <ImageExtractor />
+    )
+  }
+  if (activeTool === 'colors') {
+    return (
+      <ColorTools
+        onBack={() =>
+          setActiveTool('dashboard')
+        }
+      />
     )
   }
 
@@ -76,6 +86,21 @@ function App() {
 
             <p className="mt-1 text-xs text-zinc-500">
               Extract images from pages
+            </p>
+          </button>
+          
+          <button
+            onClick={() => setActiveTool('colors')}
+            className="rounded-xl border border-zinc-800 bg-zinc-900 p-4 text-left transition hover:border-zinc-700 hover:bg-zinc-800"
+          >
+            <div className="mb-3 text-2xl">🎨</div>
+
+            <h3 className="font-semibold">
+              Colors
+            </h3>
+
+            <p className="mt-1 text-xs text-zinc-500">
+              Pick and convert colors
             </p>
           </button>
 
