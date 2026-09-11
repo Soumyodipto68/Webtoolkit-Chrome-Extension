@@ -3,8 +3,9 @@ import PasswordGenerator from "./tools/password-generator/PasswordGenerator";
 import ImageExtractor from "./tools/image-extractor/ImageExtractor";
 import ColorTools from "./tools/color-tools/ColorTools";
 import JsonTools from "./tools/json-tools/JsonTools";
+import CssTools from "./tools/css-tools/CssTools";
 
-type Tool = "dashboard" | "password" | "images" | "colors" | "json";
+type Tool = "dashboard" | "password" | "images" | "colors" | "json" | "css";
 
 function App() {
   const [activeTool, setActiveTool] = useState<Tool>("dashboard");
@@ -22,6 +23,10 @@ function App() {
 
   if (activeTool === "json") {
     return <JsonTools onBack={() => setActiveTool("dashboard")} />;
+  }
+
+  if (activeTool === "css") {
+    return <CssTools onBack={() => setActiveTool("dashboard")} />;
   }
 
   return (
@@ -93,6 +98,19 @@ function App() {
 
             <p className="mt-1 text-xs text-zinc-500">
               Format and validate JSON
+            </p>
+          </button>
+
+          <button
+            onClick={() => setActiveTool("css")}
+            className="rounded-xl border border-zinc-800 bg-zinc-900 p-4 text-left transition hover:border-zinc-700 hover:bg-zinc-800"
+          >
+            <div className="mb-3 text-2xl">🔎</div>
+
+            <h3 className="font-semibold">CSS Extractor</h3>
+
+            <p className="mt-1 text-xs text-zinc-500">
+              Extract classes and IDs
             </p>
           </button>
         </div>

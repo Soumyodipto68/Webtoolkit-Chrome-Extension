@@ -3,11 +3,7 @@
   "name": "WebToolKit",
   "version": "1.0.0",
   "description": "A powerful collection of useful browser tools.",
-  "permissions": [
-    "activeTab",
-    "scripting",
-    "downloads"
-  ],
+  "permissions": ["activeTab", "scripting", "downloads"],
   "action": {
     "default_popup": "index.html"
   },
@@ -15,6 +11,10 @@
     {
       "matches": ["<all_urls>"],
       "js": ["content.js"]
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["cssExtractor.js"]
     }
   ]
 }
