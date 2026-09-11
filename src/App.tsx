@@ -30,12 +30,12 @@ function App() {
   }
 
   return (
-    <main className="min-h-[500px] w-[380px] bg-zinc-950 p-5 text-white">
+    <main className="min-h-[500px] w-[380px] bg-zinc-950 p-5 text-white rounded-2xl shadow-xl">
       <header className="mb-6">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold tracking-tight">🧰 WebToolKit</h1>
 
-          <button className="rounded-lg p-2 text-zinc-400 hover:bg-zinc-800 hover:text-white">
+          <button className="rounded-md p-2 text-zinc-400 hover:bg-zinc-800 hover:text-white transition cursor-pointer">
             ⚙️
           </button>
         </div>
@@ -47,71 +47,70 @@ function App() {
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">
           Tools
         </h2>
-
-        <div className="grid grid-cols-2 gap-3">
+        <div className="flex flex-col space-y-3">
           <button
             onClick={() => setActiveTool("password")}
-            className="rounded-xl border border-zinc-800 bg-zinc-900 p-4 text-left transition hover:border-zinc-700 hover:bg-zinc-800"
+            className="flex items-center rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 transition cursor-pointer hover:border-zinc-700 hover:bg-zinc-800 hover:shadow-[0_0_8px_rgba(255,255,255,0.2)] hover:border-l-4 hover:border-l-indigo-400"
           >
-            <div className="mb-3 text-2xl">🔐</div>
-
-            <h3 className="font-semibold">Password</h3>
-
-            <p className="mt-1 text-xs text-zinc-500">
-              Generate strong passwords
-            </p>
+            <span className="mr-3 text-xl flex-shrink-0">🔐</span>
+            <div className="flex flex-col justify-center">
+              <h3 className="font-semibold leading-tight">Password</h3>
+              <p className="text-xs text-zinc-500 leading-snug">
+                Generate strong passwords
+              </p>
+            </div>
           </button>
 
           <button
             onClick={() => setActiveTool("images")}
-            className="rounded-xl border border-zinc-800 bg-zinc-900 p-4 text-left transition hover:border-zinc-700 hover:bg-zinc-800"
+            className="flex items-center rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 transition cursor-pointer hover:border-zinc-700 hover:bg-zinc-800 hover:shadow-[0_0_8px_rgba(255,255,255,0.2)] hover:border-l-4 hover:border-l-indigo-400"
           >
-            <div className="mb-3 text-2xl">🖼️</div>
-
-            <h3 className="font-semibold">Images</h3>
-
-            <p className="mt-1 text-xs text-zinc-500">
-              Extract images from pages
-            </p>
+            <span className="mr-3 text-xl flex-shrink-0">🖼️</span>
+            <div className="flex flex-col justify-center">
+              <h3 className="font-semibold leading-tight">Images</h3>
+              <p className="text-xs text-zinc-500 leading-snug">
+                Extract images from pages
+              </p>
+            </div>
           </button>
 
           <button
             onClick={() => setActiveTool("colors")}
-            className="rounded-xl border border-zinc-800 bg-zinc-900 p-4 text-left transition hover:border-zinc-700 hover:bg-zinc-800"
+            className="flex items-center rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 transition cursor-pointer hover:border-zinc-700 hover:bg-zinc-800 hover:shadow-[0_0_8px_rgba(255,255,255,0.2)] hover:border-l-4 hover:border-l-indigo-400"
           >
-            <div className="mb-3 text-2xl">🎨</div>
-
-            <h3 className="font-semibold">Colors</h3>
-
-            <p className="mt-1 text-xs text-zinc-500">
-              Pick and convert colors
-            </p>
+            <span className="mr-3 text-xl flex-shrink-0">🎨</span>
+            <div className="flex flex-col justify-center">
+              <h3 className="font-semibold leading-tight">Colors</h3>
+              <p className="text-xs text-zinc-500 leading-snug">
+                Pick and convert colors
+              </p>
+            </div>
           </button>
 
           <button
             onClick={() => setActiveTool("json")}
-            className="rounded-xl border border-zinc-800 bg-zinc-900 p-4 text-left transition hover:border-zinc-700 hover:bg-zinc-800"
+            className="flex items-center rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 transition cursor-pointer hover:border-zinc-700 hover:bg-zinc-800 hover:shadow-[0_0_8px_rgba(255,255,255,0.2)] hover:border-l-4 hover:border-l-indigo-400"
           >
-            <div className="mb-3 text-2xl">🧩</div>
-
-            <h3 className="font-semibold">JSON Formatter</h3>
-
-            <p className="mt-1 text-xs text-zinc-500">
-              Format and validate JSON
-            </p>
+            <span className="mr-3 text-xl flex-shrink-0">🧩</span>
+            <div className="flex flex-col justify-center">
+              <h3 className="font-semibold leading-tight">JSON Formatter</h3>
+              <p className="text-xs text-zinc-500 leading-snug">
+                Format and validate JSON
+              </p>
+            </div>
           </button>
 
           <button
             onClick={() => setActiveTool("css")}
-            className="rounded-xl border border-zinc-800 bg-zinc-900 p-4 text-left transition hover:border-zinc-700 hover:bg-zinc-800"
+            className="flex items-center rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 transition cursor-pointer hover:border-zinc-700 hover:bg-zinc-800 hover:shadow-[0_0_8px_rgba(255,255,255,0.2)] hover:border-l-4 hover:border-l-indigo-400"
           >
-            <div className="mb-3 text-2xl">🔎</div>
-
-            <h3 className="font-semibold">CSS Extractor</h3>
-
-            <p className="mt-1 text-xs text-zinc-500">
-              Extract classes and IDs
-            </p>
+            <span className="mr-3 text-xl flex-shrink-0">🔎</span>
+            <div className="flex flex-col justify-center">
+              <h3 className="font-semibold leading-tight">CSS Extractor</h3>
+              <p className="text-xs text-zinc-500 leading-snug">
+                Extract classes and IDs
+              </p>
+            </div>
           </button>
         </div>
       </section>
