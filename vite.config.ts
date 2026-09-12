@@ -15,6 +15,8 @@ export default defineConfig({
         main: resolve(__dirname, "index.html"),
         content: resolve(__dirname, "src/content/imageExtractor.ts"),
         cssExtractor: resolve(__dirname, "src/content/cssExtractor.ts"),
+        cssPicker: resolve(__dirname, "src/content/cssPicker.ts"),
+        background: resolve(__dirname, "src/background.ts"),
       },
 
       output: {
@@ -25,6 +27,14 @@ export default defineConfig({
 
           if (chunkInfo.name === "cssExtractor") {
             return "cssExtractor.js"
+          }
+
+          if (chunkInfo.name === "cssPicker") {
+            return "cssPicker.js"
+          }
+
+          if (chunkInfo.name === "background") {
+            return "background.js"
           }
 
           return "assets/[name].js"
