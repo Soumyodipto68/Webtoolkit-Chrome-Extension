@@ -63,8 +63,8 @@ export default function CssTools({
       chrome.runtime.onMessage.removeListener(listener)
     }
   }, [])
-
-  const startPicker = async () => {
+  
+const startPicker = async () => {
   try {
     const [tab] = await chrome.tabs.query({
       active: true,
@@ -73,24 +73,17 @@ export default function CssTools({
 
     if (!tab.id) return
 
-    try {
-      await chrome.tabs.sendMessage(tab.id, {
-        type: 'START_CSS_PICKER',
-      })
-    } catch {
-      await chrome.scripting.executeScript({
-        target: {
-          tabId: tab.id,
-        },
-        files: ['cssPicker.js'],
-      })
+    await chrome.scripting.executeScript({
+      target: {
+        tabId: tab.id,
+      },
+      files: ['cssPicker.js'],
+    })
 
-      await chrome.tabs.sendMessage(tab.id, {
-        type: 'START_CSS_PICKER',
-      })
-    }
+    await chrome.tabs.sendMessage(tab.id, {
+      type: 'START_CSS_PICKER',
+    })
 
-    // Popup is intentionally allowed to close.
     window.close()
   } catch (error) {
     console.error('Failed to start CSS picker:', error)

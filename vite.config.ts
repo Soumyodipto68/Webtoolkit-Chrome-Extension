@@ -4,7 +4,10 @@ import tailwindcss from "@tailwindcss/vite"
 import { resolve } from "path"
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(),
+    tailwindcss(),
+  ],
 
   build: {
     outDir: "dist",
@@ -12,11 +15,15 @@ export default defineConfig({
 
     rollupOptions: {
       input: {
-        main: resolve(__dirname, "index.html"),
-        content: resolve(__dirname, "src/content/imageExtractor.ts"),
-        cssExtractor: resolve(__dirname, "src/content/cssExtractor.ts"),
-        cssPicker: resolve(__dirname, "src/content/cssPicker.ts"),
-        background: resolve(__dirname, "src/background.ts"),
+        main: resolve(import.meta.dirname, "index.html"),
+        content: resolve(
+          import.meta.dirname,
+          "src/content/imageExtractor.ts"
+        ),
+        cssPicker: resolve(
+          import.meta.dirname,
+          "src/content/cssPicker.ts"
+        ),
       },
 
       output: {
@@ -25,16 +32,8 @@ export default defineConfig({
             return "content.js"
           }
 
-          if (chunkInfo.name === "cssExtractor") {
-            return "cssExtractor.js"
-          }
-
           if (chunkInfo.name === "cssPicker") {
             return "cssPicker.js"
-          }
-
-          if (chunkInfo.name === "background") {
-            return "background.js"
           }
 
           return "assets/[name].js"
