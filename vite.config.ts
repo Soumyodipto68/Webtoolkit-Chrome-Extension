@@ -20,6 +20,10 @@ export default defineConfig({
           import.meta.dirname,
           "src/content/imageExtractor.ts"
         ),
+        background: resolve(
+          import.meta.dirname,
+          "src/background.ts"
+        ),
         cssPicker: resolve(
           import.meta.dirname,
           "src/content/cssPicker.ts"
@@ -30,6 +34,10 @@ export default defineConfig({
         entryFileNames: (chunkInfo) => {
           if (chunkInfo.name === "content") {
             return "content.js"
+          }
+
+          if (chunkInfo.name === "background") {
+            return "background.js"
           }
 
           if (chunkInfo.name === "cssPicker") {
