@@ -1,4 +1,4 @@
-import type { FieldType } from "../types";
+import type { DetectedField, FieldType } from "../types";
 
 const firstNames = [
   "Alex",
@@ -215,4 +215,99 @@ export function shouldCheckCheckbox(
   }
 
   return true;
+}
+
+function dispatchInputEvents(element: HTMLElement): void {
+  element.dispatchEvent(new Event("input", { bubbles: true }));
+  element.dispatchEvent(new Event("change", { bubbles: true }));
+}
+
+function setControlValue(
+  element: HTMLInputElement | HTMLTextAreaElement,
+  value: string,
+): void {
+  const prototype =
+    element instanceof HTMLTextAreaElement
+      ? HTMLTextAreaElement.prototype
+      : HTMLInputElement.prototype;
+  const descriptor = Object.getOwnPropertyDescriptor(
+    prototype,
+    "value",
+  );
+
+  if (descriptor?.set) {
+    descriptor.set.call(element, value);
+  } else {
+    element.value = value;
+  }
+
+  dispatchInputEvents(element);
+}
+
+export function fillFields(fields: DetectedField[]): number {
+  const elements = Array.from(
+    document.querySelectorAll<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >("input, textarea, select"),
+  );
+  const filledRadioGroups = new Set<string>();
+  let filledCount = 0;
+
+  fields.forEach((field) => {
+    const element = elements[field.index];
+
+    if (!element) {
+      return;
+    }
+
+    if (field.type === "radio") {
+      const group = element as HTMLInputElement;
+      const groupKey = group.name || `radio-${field.index}`;
+
+      if (filledRadioGroups.has(groupKey)) {
+        return;
+      }
+
+      group.checked = true;
+      dispatchInputEvents(group);
+      filledRadioGroups.add(groupKey);
+      filledCount += 1;
+      return;
+    }
+
+    if (field.type === "checkbox") {
+      const checkbox = element as HTMLInputElement;
+
+      if (shouldCheckCheckbox(checkbox)) {
+        checkbox.checked = true;
+        dispatchInputEvents(checkbox);
+        filledCount += 1;
+      }
+
+      return;
+    }
+
+    if (field.type === "select") {
+      const select = element as HTMLSelectElement;
+      const value = generateSelectValue(select);
+
+      if (value !== null) {
+        select.value = value;
+        dispatchInputEvents(select);
+        filledCount += 1;
+      }
+
+      return;
+    }
+
+    if (
+      element instanceof HTMLInputElement ||
+      element instanceof HTMLTextAreaElement
+    ) {
+      setControlValue(element, generateFakeData(field.type));
+      filledCount += 1;
+    }
+  });
+
+  return filledCount;
 }

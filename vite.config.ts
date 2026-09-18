@@ -20,6 +20,14 @@ export default defineConfig({
           import.meta.dirname,
           "src/content/imageExtractor.ts"
         ),
+        cssExtractor: resolve(
+          import.meta.dirname,
+          "src/content/cssExtractor.ts"
+        ),
+        fakeFiller: resolve(
+          import.meta.dirname,
+          "src/content/fakeFiller.ts"
+        ),
         background: resolve(
           import.meta.dirname,
           "src/background.ts"
@@ -42,6 +50,14 @@ export default defineConfig({
 
           if (chunkInfo.name === "cssPicker") {
             return "cssPicker.js"
+          }
+
+          if (chunkInfo.name === "cssExtractor") {
+            return "cssExtractor.js"
+          }
+
+          if (chunkInfo.name === "fakeFiller") {
+            return "fakeFiller.js"
           }
 
           return "assets/[name].js"
