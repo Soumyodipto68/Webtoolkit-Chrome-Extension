@@ -15,6 +15,9 @@ export type FieldType =
   | "website"
   | "number"
   | "date"
+  | "select"
+  | "radio"
+  | "checkbox"
   | "text"
   | "unknown";
 
@@ -26,4 +29,5 @@ export type DetectedField = {
   name: string;
   id: string;
   placeholder: string;
+  label: string;
 };

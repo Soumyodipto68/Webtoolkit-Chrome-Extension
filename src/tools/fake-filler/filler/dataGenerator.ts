@@ -62,11 +62,18 @@ const countries = [
 ];
 
 function randomItem<T>(items: T[]): T {
-  return items[Math.floor(Math.random() * items.length)];
+  return items[
+    Math.floor(Math.random() * items.length)
+  ];
 }
 
-function randomNumber(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+function randomNumber(
+  min: number,
+  max: number,
+): number {
+  return Math.floor(
+    Math.random() * (max - min + 1),
+  ) + min;
 }
 
 function generatePassword(): string {
@@ -74,11 +81,15 @@ function generatePassword(): string {
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
 
   return Array.from({ length: 12 }, () =>
-    chars.charAt(randomNumber(0, chars.length - 1)),
+    chars.charAt(
+      randomNumber(0, chars.length - 1),
+    ),
   ).join("");
 }
 
-export function generateFakeData(type: FieldType): string {
+export function generateFakeData(
+  type: FieldType,
+): string {
   const firstName = randomItem(firstNames);
   const lastName = randomItem(lastNames);
 
@@ -99,7 +110,10 @@ export function generateFakeData(type: FieldType): string {
       )}@example.com`;
 
     case "phone":
-      return `+91 ${randomNumber(7000000000, 9999999999)}`;
+      return `+91 ${randomNumber(
+        7000000000,
+        9999999999,
+      )}`;
 
     case "username":
       return `${firstName.toLowerCase()}${lastName.toLowerCase()}${randomNumber(
@@ -111,7 +125,10 @@ export function generateFakeData(type: FieldType): string {
       return generatePassword();
 
     case "address":
-      return `${randomNumber(10, 999)} Park Street`;
+      return `${randomNumber(
+        10,
+        999,
+      )} Park Street`;
 
     case "city":
       return randomItem(cities);
@@ -123,7 +140,9 @@ export function generateFakeData(type: FieldType): string {
       return randomItem(countries);
 
     case "zip":
-      return String(randomNumber(700001, 799999));
+      return String(
+        randomNumber(700001, 799999),
+      );
 
     case "company":
       return randomItem(companies);
@@ -137,7 +156,10 @@ export function generateFakeData(type: FieldType): string {
     case "date": {
       const date = new Date();
 
-      date.setDate(date.getDate() - randomNumber(0, 365));
+      date.setDate(
+        date.getDate() -
+          randomNumber(0, 365),
+      );
 
       return date.toISOString().split("T")[0];
     }
@@ -148,4 +170,49 @@ export function generateFakeData(type: FieldType): string {
     default:
       return "Sample test data";
   }
+}
+
+export function generateSelectValue(
+  select: HTMLSelectElement,
+): string | null {
+  const options = Array.from(
+    select.options,
+  ).filter(
+    (option) =>
+      !option.disabled &&
+      option.value.trim() !== "",
+  );
+
+  if (options.length === 0) {
+    return null;
+  }
+
+  return randomItem(options).value;
+}
+
+export function shouldCheckCheckbox(
+  checkbox: HTMLInputElement,
+): boolean {
+  const text = `
+    ${checkbox.name}
+    ${checkbox.id}
+    ${checkbox.value}
+    ${checkbox.getAttribute("aria-label") || ""}
+  `.toLowerCase();
+
+  /*
+   * Don't automatically agree to things like:
+   * terms, conditions, privacy policies.
+   */
+  if (
+    text.includes("terms") ||
+    text.includes("condition") ||
+    text.includes("privacy") ||
+    text.includes("agreement") ||
+    text.includes("consent")
+  ) {
+    return false;
+  }
+
+  return true;
 }

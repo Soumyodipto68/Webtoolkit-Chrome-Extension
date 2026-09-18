@@ -1,16 +1,51 @@
 import type { DetectedField, FieldType } from "../types";
 
+function getLabel(element: HTMLElement): string {
+  const id = element.id;
+
+  if (id) {
+    const label = document.querySelector(
+      `label[for="${CSS.escape(id)}"]`,
+    );
+
+    if (label) {
+      return label.textContent?.trim() || "";
+    }
+  }
+
+  const parentLabel = element.closest("label");
+
+  if (parentLabel) {
+    return parentLabel.textContent?.trim() || "";
+  }
+
+  return "";
+}
+
 function detectFieldType(
-  element: HTMLInputElement | HTMLTextAreaElement,
+  element: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement,
 ): FieldType {
-  const type = element.type?.toLowerCase() || "";
-  const name = element.name?.toLowerCase() || "";
-  const id = element.id?.toLowerCase() || "";
-  const placeholder = element.placeholder?.toLowerCase() || "";
+  const tagName = element.tagName.toLowerCase();
+
+  if (tagName === "select") {
+    return "select";
+  }
+
+  const input = element as HTMLInputElement;
+
+  const type = input.type?.toLowerCase() || "";
+  const name = input.name?.toLowerCase() || "";
+  const id = input.id?.toLowerCase() || "";
+  const placeholder =
+    input.placeholder?.toLowerCase() || "";
+
   const autocomplete =
     element.getAttribute("autocomplete")?.toLowerCase() || "";
+
   const ariaLabel =
     element.getAttribute("aria-label")?.toLowerCase() || "";
+
+  const label = getLabel(element).toLowerCase();
 
   const combined = `
     ${type}
@@ -19,7 +54,16 @@ function detectFieldType(
     ${placeholder}
     ${autocomplete}
     ${ariaLabel}
+    ${label}
   `.toLowerCase();
+
+  if (type === "radio") {
+    return "radio";
+  }
+
+  if (type === "checkbox") {
+    return "checkbox";
+  }
 
   if (
     autocomplete.includes("given-name") ||
@@ -36,7 +80,6 @@ function detectFieldType(
   }
 
   if (
-    autocomplete.includes("name") ||
     /\b(full[-_ ]?name|fullname)\b/.test(combined)
   ) {
     return "fullName";
@@ -100,13 +143,17 @@ function detectFieldType(
 
   if (
     autocomplete.includes("postal-code") ||
-    /\b(zip|zipcode|zip-code|postal|postcode|pin|pincode)\b/.test(combined)
+    /\b(zip|zipcode|zip-code|postal|postcode|pin|pincode)\b/.test(
+      combined,
+    )
   ) {
     return "zip";
   }
 
   if (
-    /\b(company|organization|organisation|business|employer)\b/.test(combined)
+    /\b(company|organization|organisation|business|employer)\b/.test(
+      combined,
+    )
   ) {
     return "company";
   }
@@ -138,28 +185,81 @@ function detectFieldType(
   return "unknown";
 }
 
+function shouldSkip(
+  element:
+    | HTMLInputElement
+    | HTMLTextAreaElement
+    | HTMLSelectElement,
+): boolean {
+  if (element.disabled) {
+    return true;
+  }
+
+  if (
+    (element instanceof HTMLInputElement ||
+      element instanceof HTMLTextAreaElement) &&
+    element.readOnly
+  ) {
+    return true;
+  }
+
+  const input = element as HTMLInputElement;
+
+  if (
+    input.type === "hidden" ||
+    input.type === "submit" ||
+    input.type === "reset" ||
+    input.type === "button" ||
+    input.type === "image"
+  ) {
+    return true;
+  }
+
+  const style = window.getComputedStyle(element);
+
+  if (
+    style.display === "none" ||
+    style.visibility === "hidden"
+  ) {
+    return true;
+  }
+
+  const rect = element.getBoundingClientRect();
+
+  if (rect.width === 0 && rect.height === 0) {
+    return true;
+  }
+
+  return false;
+}
+
 export function detectFields(): DetectedField[] {
   const elements = Array.from(
-    document.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(
-      "input, textarea",
-    ),
+    document.querySelectorAll<
+      HTMLInputElement |
+        HTMLTextAreaElement |
+        HTMLSelectElement
+    >("input, textarea, select"),
   );
 
   return elements
     .map((element, index) => {
-      const field: DetectedField = {
-        index,
-        type: detectFieldType(element),
-        tagName: element.tagName.toLowerCase(),
-        inputType: element.type || "",
-        name: element.name || "",
-        id: element.id || "",
-        placeholder: element.placeholder || "",
-      };
+      const type = detectFieldType(element);
 
       return {
         element,
-        field,
+        field: {
+          index,
+          type,
+          tagName: element.tagName.toLowerCase(),
+          inputType:
+            (element as HTMLInputElement).type || "",
+          name: element.name || "",
+          id: element.id || "",
+          placeholder:
+            (element as HTMLInputElement).placeholder || "",
+          label: getLabel(element),
+        },
       };
     })
     .filter(({ element, field }) => {
@@ -167,36 +267,7 @@ export function detectFields(): DetectedField[] {
         return false;
       }
 
-      if (element.disabled) {
-        return false;
-      }
-
-      if (element.readOnly) {
-        return false;
-      }
-
-      if (element.type === "hidden") {
-        return false;
-      }
-
-      if (
-        element.type === "submit" ||
-        element.type === "reset" ||
-        element.type === "button"
-      ) {
-        return false;
-      }
-
-      const style = window.getComputedStyle(element);
-
-      if (
-        style.display === "none" ||
-        style.visibility === "hidden"
-      ) {
-        return false;
-      }
-
-      return true;
+      return !shouldSkip(element);
     })
     .map(({ field }) => field);
 }
