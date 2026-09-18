@@ -61,35 +61,128 @@ const countries = [
   "Australia",
 ];
 
+const jobTitles = [
+  "Software Engineer",
+  "Frontend Developer",
+  "Backend Developer",
+  "Full Stack Developer",
+  "Web Developer",
+  "UI Developer",
+  "Software Developer",
+  "Product Designer",
+  "Project Manager",
+  "Data Analyst",
+];
+
+const occupations = [
+  "Software Developer",
+  "Web Developer",
+  "Software Engineer",
+  "UI Designer",
+  "Data Analyst",
+  "Product Manager",
+  "Business Analyst",
+  "Consultant",
+];
+
+const descriptions = [
+  "Looking for a reliable solution to improve our workflow.",
+  "I am interested in learning more about your services.",
+  "This is sample content generated for form testing.",
+  "I would like to discuss this opportunity in more detail.",
+  "We are looking for a solution that can simplify our process.",
+];
+
+const messages = [
+  "Hello, I would like to know more about your services.",
+  "Please contact me with more information.",
+  "I am interested in learning more about this.",
+  "Could you please provide some additional details?",
+  "I would like to discuss this further.",
+];
+
+const bios = [
+  "Software developer interested in building modern web applications.",
+  "Web developer focused on creating useful and responsive applications.",
+  "Technology enthusiast who enjoys building and learning new things.",
+  "Developer interested in web technologies and software development.",
+];
+
+const subjects = [
+  "Request for more information",
+  "Website development inquiry",
+  "Product information",
+  "General inquiry",
+  "Service request",
+];
+
+const titles = [
+  "Software Development",
+  "Website Project",
+  "New Project",
+  "Product Development",
+  "Web Application",
+];
+
+const comments = [
+  "Looks good. I would like to know more.",
+  "This is useful information.",
+  "I have a question about this.",
+  "Please provide some additional details.",
+  "I would like to discuss this further.",
+];
+
+const notes = [
+  "Follow up with the customer.",
+  "Review this information later.",
+  "Additional details required.",
+  "Contact the user for more information.",
+  "Check this item again.",
+];
+
+const searchTerms = [
+  "software development",
+  "web development",
+  "React",
+  "technology",
+  "digital solutions",
+];
+
+const textSamples = [
+  "Looking forward to hearing from you.",
+  "This is some sample content for testing.",
+  "I would like to learn more about your services.",
+  "Please provide more information about this.",
+  "This is a randomly generated test value.",
+  "Testing the form with sample information.",
+  "I am interested in exploring this opportunity.",
+  "Please contact me with additional details.",
+];
+
 function randomItem<T>(items: T[]): T {
-  return items[
-    Math.floor(Math.random() * items.length)
-  ];
+  return items[Math.floor(Math.random() * items.length)];
 }
 
-function randomNumber(
-  min: number,
-  max: number,
-): number {
-  return Math.floor(
-    Math.random() * (max - min + 1),
-  ) + min;
+function randomNumber(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function generatePassword(): string {
-  const chars =
+  const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
 
   return Array.from({ length: 12 }, () =>
-    chars.charAt(
-      randomNumber(0, chars.length - 1),
+    characters.charAt(
+      randomNumber(0, characters.length - 1),
     ),
   ).join("");
 }
 
-export function generateFakeData(
-  type: FieldType,
-): string {
+function generateText(): string {
+  return randomItem(textSamples);
+}
+
+export function generateFakeData(type: FieldType): string {
   const firstName = randomItem(firstNames);
   const lastName = randomItem(lastNames);
 
@@ -110,10 +203,7 @@ export function generateFakeData(
       )}@example.com`;
 
     case "phone":
-      return `+91 ${randomNumber(
-        7000000000,
-        9999999999,
-      )}`;
+      return `+91 ${randomNumber(7000000000, 9999999999)}`;
 
     case "username":
       return `${firstName.toLowerCase()}${lastName.toLowerCase()}${randomNumber(
@@ -125,10 +215,7 @@ export function generateFakeData(
       return generatePassword();
 
     case "address":
-      return `${randomNumber(
-        10,
-        999,
-      )} Park Street`;
+      return `${randomNumber(10, 999)} Park Street`;
 
     case "city":
       return randomItem(cities);
@@ -140,9 +227,7 @@ export function generateFakeData(
       return randomItem(countries);
 
     case "zip":
-      return String(
-        randomNumber(700001, 799999),
-      );
+      return String(randomNumber(700001, 799999));
 
     case "company":
       return randomItem(companies);
@@ -157,27 +242,54 @@ export function generateFakeData(
       const date = new Date();
 
       date.setDate(
-        date.getDate() -
-          randomNumber(0, 365),
+        date.getDate() - randomNumber(0, 365),
       );
 
       return date.toISOString().split("T")[0];
     }
 
+    case "jobTitle":
+      return randomItem(jobTitles);
+
+    case "occupation":
+      return randomItem(occupations);
+
+    case "description":
+      return randomItem(descriptions);
+
+    case "message":
+      return randomItem(messages);
+
+    case "bio":
+      return randomItem(bios);
+
+    case "subject":
+      return randomItem(subjects);
+
+    case "title":
+      return randomItem(titles);
+
+    case "comment":
+      return randomItem(comments);
+
+    case "notes":
+      return randomItem(notes);
+
+    case "search":
+      return randomItem(searchTerms);
+
     case "text":
-      return "This is sample test data generated by WebToolKit.";
+      return generateText();
 
     default:
-      return "Sample test data";
+      return generateText();
   }
 }
 
 export function generateSelectValue(
   select: HTMLSelectElement,
 ): string | null {
-  const options = Array.from(
-    select.options,
-  ).filter(
+  const options = Array.from(select.options).filter(
     (option) =>
       !option.disabled &&
       option.value.trim() !== "",
@@ -187,7 +299,33 @@ export function generateSelectValue(
     return null;
   }
 
-  return randomItem(options).value;
+  const fieldText = `
+    ${select.name}
+    ${select.id}
+    ${select.getAttribute("aria-label") || ""}
+  `.toLowerCase();
+
+  const preferredOption = options.find((option) => {
+    const text = `
+      ${option.value}
+      ${option.textContent || ""}
+    `.toLowerCase();
+
+    if (fieldText.includes("country")) {
+      return text.includes("india");
+    }
+
+    if (
+      fieldText.includes("state") ||
+      fieldText.includes("province")
+    ) {
+      return text.includes("west bengal");
+    }
+
+    return false;
+  });
+
+  return preferredOption?.value ?? randomItem(options).value;
 }
 
 export function shouldCheckCheckbox(
@@ -200,19 +338,11 @@ export function shouldCheckCheckbox(
     ${checkbox.getAttribute("aria-label") || ""}
   `.toLowerCase();
 
-  /*
-   * Don't automatically agree to things like:
-   * terms, conditions, privacy policies.
-   */
-  if (
+  return !(
     text.includes("terms") ||
     text.includes("condition") ||
     text.includes("privacy") ||
     text.includes("agreement") ||
     text.includes("consent")
-  ) {
-    return false;
-  }
-
-  return true;
+  );
 }

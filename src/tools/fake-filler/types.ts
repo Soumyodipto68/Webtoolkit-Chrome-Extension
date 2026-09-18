@@ -18,6 +18,16 @@ export type FieldType =
   | "select"
   | "radio"
   | "checkbox"
+  | "jobTitle"
+  | "occupation"
+  | "description"
+  | "message"
+  | "bio"
+  | "subject"
+  | "title"
+  | "comment"
+  | "notes"
+  | "search"
   | "text"
   | "unknown";
 
