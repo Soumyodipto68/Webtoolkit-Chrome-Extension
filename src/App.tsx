@@ -4,7 +4,17 @@ import ImageExtractor from "./tools/image-extractor/ImageExtractor";
 import ColorTools from "./tools/color-tools/ColorTools";
 import JsonTools from "./tools/json-tools/JsonTools";
 import CssTools from "./tools/css-tools/CssTools";
-type Tool = "dashboard" | "password" | "images" | "colors" | "json" | "css";
+import FakeFillerTools from "./tools/fake-filler/FakeFillerTools";
+
+type Tool =
+  | "dashboard"
+  | "password"
+  | "images"
+  | "colors"
+  | "json"
+  | "css"
+  | "fake-filler";
+
 function App() {
   const [activeTool, setActiveTool] = useState<Tool>("dashboard");
   useEffect(() => {
@@ -14,6 +24,7 @@ function App() {
       }
     });
   }, []);
+
   if (activeTool === "password") {
     return <PasswordGenerator />;
   }
@@ -29,6 +40,10 @@ function App() {
   if (activeTool === "css") {
     return <CssTools onBack={() => setActiveTool("dashboard")} />;
   }
+  if (activeTool === "fake-filler") {
+    return <FakeFillerTools onBack={() => setActiveTool("dashboard")} />;
+  }
+
   return (
     <main className="min-h-[500px] w-[380px] bg-zinc-950 p-5 text-white rounded-2xl shadow-xl">
       {" "}
@@ -137,6 +152,20 @@ function App() {
                 Extract classes and IDs{" "}
               </p>{" "}
             </div>{" "}
+          </button>{" "}
+          <button
+            onClick={() => setActiveTool("fake-filler")}
+            className="flex items-center rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 transition cursor-pointer hover:border-zinc-700 hover:bg-zinc-800 hover:shadow-[0_0_8px_rgba(255,255,255,0.2)] hover:border-l-4 hover:border-l-indigo-400"
+          >
+            <span className="mr-3 flex-shrink-0 text-xl">🎲</span>
+
+            <div className="flex flex-col justify-center">
+              <h3 className="font-semibold leading-tight">Fake Filler</h3>
+
+              <p className="text-xs leading-snug text-zinc-500">
+                Automatically fill forms
+              </p>
+            </div>
           </button>{" "}
         </div>{" "}
       </section>{" "}
