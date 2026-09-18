@@ -74,6 +74,12 @@ function fillRadio(radio: HTMLInputElement): boolean {
   return true;
 }
 
+function hasExistingValue(
+  element: HTMLInputElement | HTMLTextAreaElement,
+): boolean {
+  return element.value.trim().length > 0;
+}
+
 export function fillFields(fields: DetectedField[]): number {
   const elements = Array.from(
     document.querySelectorAll("input, textarea, select"),
@@ -119,7 +125,14 @@ export function fillFields(fields: DetectedField[]): number {
 
     // Select dropdowns
     if (field.type === "select") {
-      if (fillSelect(element as HTMLSelectElement)) {
+      const select = element as HTMLSelectElement;
+
+      // Don't overwrite an already selected option
+      if (select.value && select.selectedIndex > 0) {
+        return;
+      }
+
+      if (fillSelect(select)) {
         filledCount++;
       }
 
@@ -127,10 +140,16 @@ export function fillFields(fields: DetectedField[]): number {
     }
 
     // Text / textarea / other supported fields
+    // Text / textarea / other supported fields
     if (
       element instanceof HTMLInputElement ||
       element instanceof HTMLTextAreaElement
     ) {
+      // Do not overwrite existing user input
+      if (hasExistingValue(element)) {
+        return;
+      }
+
       const value = generateFakeData(field.type);
 
       setInputValue(element, value);
