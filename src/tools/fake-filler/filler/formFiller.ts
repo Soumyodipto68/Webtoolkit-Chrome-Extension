@@ -40,6 +40,28 @@ function setInputValue(
   dispatchInputEvents(element);
 }
 
+function hasExistingValue(
+  element: HTMLInputElement | HTMLTextAreaElement,
+): boolean {
+  return element.value.trim().length > 0;
+}
+
+function isConfirmationField(field: DetectedField): boolean {
+  const text = `
+    ${field.name}
+    ${field.id}
+    ${field.placeholder}
+    ${field.label}
+  `.toLowerCase();
+
+  return (
+    text.includes("confirm") ||
+    text.includes("confirmation") ||
+    text.includes("retype") ||
+    text.includes("repeat")
+  );
+}
+
 function fillSelect(select: HTMLSelectElement): boolean {
   const value = generateSelectValue(select);
 
@@ -59,6 +81,11 @@ function fillCheckbox(checkbox: HTMLInputElement): boolean {
     return false;
   }
 
+  // Don't modify an already checked checkbox.
+  if (checkbox.checked) {
+    return false;
+  }
+
   checkbox.checked = true;
 
   dispatchInputEvents(checkbox);
@@ -67,17 +94,16 @@ function fillCheckbox(checkbox: HTMLInputElement): boolean {
 }
 
 function fillRadio(radio: HTMLInputElement): boolean {
+  // Don't modify an already selected radio.
+  if (radio.checked) {
+    return false;
+  }
+
   radio.checked = true;
 
   dispatchInputEvents(radio);
 
   return true;
-}
-
-function hasExistingValue(
-  element: HTMLInputElement | HTMLTextAreaElement,
-): boolean {
-  return element.value.trim().length > 0;
 }
 
 export function fillFields(fields: DetectedField[]): number {
@@ -86,6 +112,9 @@ export function fillFields(fields: DetectedField[]): number {
   );
 
   const radioGroups = new Set<string>();
+
+  let generatedEmail = "";
+  let generatedPassword = "";
 
   let filledCount = 0;
 
@@ -96,7 +125,10 @@ export function fillFields(fields: DetectedField[]): number {
       return;
     }
 
+    // --------------------------------
     // Radio buttons
+    // --------------------------------
+
     if (field.type === "radio") {
       const radio = element as HTMLInputElement;
 
@@ -114,7 +146,10 @@ export function fillFields(fields: DetectedField[]): number {
       return;
     }
 
+    // --------------------------------
     // Checkboxes
+    // --------------------------------
+
     if (field.type === "checkbox") {
       if (fillCheckbox(element as HTMLInputElement)) {
         filledCount++;
@@ -123,11 +158,15 @@ export function fillFields(fields: DetectedField[]): number {
       return;
     }
 
+    // --------------------------------
     // Select dropdowns
+    // --------------------------------
+
     if (field.type === "select") {
       const select = element as HTMLSelectElement;
 
-      // Don't overwrite an already selected option
+      // Don't overwrite an already
+      // selected meaningful option.
       if (select.value && select.selectedIndex > 0) {
         return;
       }
@@ -139,18 +178,44 @@ export function fillFields(fields: DetectedField[]): number {
       return;
     }
 
-    // Text / textarea / other supported fields
-    // Text / textarea / other supported fields
+    // --------------------------------
+    // Text inputs / textarea
+    // --------------------------------
+
     if (
       element instanceof HTMLInputElement ||
       element instanceof HTMLTextAreaElement
     ) {
-      // Do not overwrite existing user input
+      // Don't overwrite existing user input.
       if (hasExistingValue(element)) {
         return;
       }
 
-      const value = generateFakeData(field.type);
+      let value = generateFakeData(field.type);
+
+      // --------------------------------
+      // Email
+      // --------------------------------
+
+      if (field.type === "email") {
+        if (isConfirmationField(field)) {
+          value = generatedEmail || value;
+        } else {
+          generatedEmail = value;
+        }
+      }
+
+      // --------------------------------
+      // Password
+      // --------------------------------
+
+      if (field.type === "password") {
+        if (isConfirmationField(field)) {
+          value = generatedPassword || value;
+        } else {
+          generatedPassword = value;
+        }
+      }
 
       setInputValue(element, value);
 
