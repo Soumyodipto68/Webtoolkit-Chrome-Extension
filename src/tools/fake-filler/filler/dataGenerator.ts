@@ -335,14 +335,83 @@ export function shouldCheckCheckbox(
     ${checkbox.name}
     ${checkbox.id}
     ${checkbox.value}
+    ${checkbox.placeholder}
     ${checkbox.getAttribute("aria-label") || ""}
   `.toLowerCase();
 
-  return !(
-    text.includes("terms") ||
-    text.includes("condition") ||
-    text.includes("privacy") ||
-    text.includes("agreement") ||
-    text.includes("consent")
-  );
+  // --------------------------------
+  // Legal / consent checkboxes
+  // --------------------------------
+
+  const legalKeywords = [
+    "terms",
+    "terms-and-conditions",
+    "terms_conditions",
+    "condition",
+    "conditions",
+    "privacy",
+    "privacy-policy",
+    "privacy_policy",
+    "consent",
+    "agreement",
+    "legal",
+    "waiver",
+    "accept-policy",
+    "accept_terms",
+    "accept-terms",
+  ];
+
+  const isLegalCheckbox =
+    legalKeywords.some((keyword) =>
+      text.includes(keyword),
+    );
+
+  if (isLegalCheckbox) {
+    return false;
+  }
+
+  // --------------------------------
+  // Preference / optional checkboxes
+  // --------------------------------
+
+  const preferenceKeywords = [
+    "newsletter",
+    "subscribe",
+    "subscription",
+    "notification",
+    "notifications",
+    "notify",
+    "updates",
+    "update",
+    "marketing",
+    "promotional",
+    "promotion",
+    "offers",
+    "offer",
+    "remember-me",
+    "remember_me",
+    "remember",
+    "preference",
+    "preferences",
+  ];
+
+  const isPreferenceCheckbox =
+    preferenceKeywords.some((keyword) =>
+      text.includes(keyword),
+    );
+
+  if (isPreferenceCheckbox) {
+    return true;
+  }
+
+  // --------------------------------
+  // Generic checkbox
+  // --------------------------------
+  //
+  // If it isn't clearly a legal/consent
+  // checkbox, allow Fake Filler to
+  // select it.
+  //
+
+  return true;
 }
